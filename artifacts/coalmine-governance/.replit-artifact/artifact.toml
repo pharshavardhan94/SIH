@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Coalmine AI Governance"
+description = "A static Smart India Hackathon prototype for coal-mine compliance monitoring, risk analysis, corrective actions, governance analytics, and reporting."
+version = "1.0.0"
+id = "artifacts/coalmine-governance"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23289
+
+[services.development]
+run = "pnpm --filter @workspace/coalmine-governance run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/coalmine-governance", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/coalmine-governance/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23289"
+BASE_PATH = "/"

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07121f" />
+    <title>Coalmine AI Governance | SIH26024</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+
+    <section id="loginScreen" class="login-screen">
+      <div class="login-grid"></div>
+      <div class="login-orb orb-one"></div>
+      <div class="login-orb orb-two"></div>
+      <div class="login-brand">
+        <div class="brand-mark large"><span class="mark-pulse"></span><span class="mark-core">C</span></div>
+        <div>
+          <div class="brand-name">COALMINE <b>AI</b></div>
+          <div class="brand-subtitle">GOVERNANCE PLATFORM</div>
+        </div>
+      </div>
+      <div class="login-content">
+        <div class="login-copy">
+          <div class="eyebrow"><span class="status-dot"></span> NATIONAL MINE SAFETY NETWORK <span class="mono">/ SIH26024</span></div>
+          <h1>Intelligent compliance.<br /><span>Safer mines.</span><br />Smarter governance.</h1>
+          <p>One command center for monitoring mine health, identifying risk early, and closing the loop on corrective action.</p>
+          <div class="flow-mini">
+            <div><strong>01</strong><span>Monitor</span></div><i></i><div><strong>02</strong><span>Identify</span></div><i></i><div><strong>03</strong><span>Track</span></div><i></i><div><strong>04</strong><span>Report</span></div>
+          </div>
+        </div>
+        <div class="auth-card">
+          <div class="auth-header">
+            <span class="section-kicker">SECURE ACCESS</span>
+            <div class="secure-badge">▣ Demo environment</div>
+          </div>
+          <h2>Welcome back</h2>
+          <p class="muted">Sign in to the national compliance network.</p>
+          <form id="loginForm">
+            <label>Email or officer ID<input id="loginEmail" type="text" value="admin@sih26024.gov.in" autocomplete="username" /></label>
+            <label>Password<div class="password-wrap"><input id="loginPassword" type="password" value="demo2026" autocomplete="current-password" /><button type="button" class="password-toggle" aria-label="Show password">◉</button></div></label>
+            <button class="btn btn-primary btn-wide" type="submit">Sign in to command center <span>→</span></button>
+          </form>
+          <button id="demoAccess" class="btn btn-ghost btn-wide">Enter demo mode <span>↗</span></button>
+          <div class="auth-foot"><span class="lock">⌁</span> Encrypted session · Prototype access only</div>
+        </div>
+      </div>
+      <div class="login-footer"><span>MINISTRY OF COAL · GOVERNMENT OF INDIA</span><span>Build 2.4.0 · Prototype data</span></div>
+    </section>
+
+    <div id="appShell" class="app-shell hidden">
+      <aside id="sidebar" class="sidebar">
+        <div class="sidebar-top">
+          <div class="brand-lockup">
+            <div class="brand-mark"><span class="mark-pulse"></span><span class="mark-core">C</span></div>
+            <div><div class="brand-name">COALMINE <b>AI</b></div><div class="brand-subtitle">GOVERNANCE</div></div>
+          </div>
+          <button id="closeSidebar" class="mobile-close" aria-label="Close navigation">×</button>
+          <div class="network-status"><span class="status-dot"></span><span>Network operational</span><small>●</small></div>
+        </div>
+        <nav class="main-nav">
+          <div class="nav-label">COMMAND</div>
+          <button class="nav-item active" data-page="dashboard"><span class="nav-icon">⌂</span><span>Overview</span><em>01</em></button>
+          <button class="nav-item" data-page="mines"><span class="nav-icon">▧</span><span>Mine management</span><em>42</em></button>
+          <button class="nav-item" data-page="violations"><span class="nav-icon">△</span><span>Violations</span><em class="danger-count">18</em></button>
+          <button class="nav-item" data-page="actions"><span class="nav-icon">✓</span><span>Corrective actions</span><em>12</em></button>
+          <div class="nav-label nav-spaced">OPERATIONS</div>
+          <button class="nav-item" data-page="inspections"><span class="nav-icon">◫</span><span>Inspections</span><em>08</em></button>
+          <button class="nav-item" data-page="risk-map"><span class="nav-icon">⌁</span><span>Risk map</span><em></em></button>
+          <button class="nav-item" data-page="analytics"><span class="nav-icon">◒</span><span>Analytics</span><em></em></button>
+          <button class="nav-item" data-page="reports"><span class="nav-icon">▤</span><span>Reports</span><em></em></button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="ai-mini-card"><div class="ai-mini-icon">✦</div><div><strong>AI Risk Engine</strong><small>Last run 4 min ago</small></div><span class="live-label">LIVE</span></div>
+          <div class="user-card"><div class="avatar">AV</div><div><strong>Arjun Verma</strong><small>Central administrator</small></div><button id="logoutBtn" aria-label="Log out">↪</button></div>
+        </div>
+      </aside>
+      <div id="sidebarOverlay" class="sidebar-overlay"></div>
+      <main class="main-area">
+        <header class="topbar">
+          <div class="topbar-left"><button id="menuToggle" class="menu-toggle" aria-label="Open navigation">☰</button><div class="breadcrumb"><span>Command center</span><b>/</b><strong id="breadcrumbCurrent">Overview</strong></div></div>
+          <div class="topbar-right"><div class="last-sync"><span class="status-dot"></span> Last updated <strong id="lastUpdated">2 min ago</strong></div><button id="globalSearchToggle" class="icon-btn" aria-label="Search">⌕</button><button id="notificationBtn" class="notification-btn" aria-label="Notifications"><span>♧</span><i>4</i></button><div class="top-avatar">AV</div></div>
+        </header>
+        <div id="globalSearchBar" class="global-search-bar hidden"><span>⌕</span><input id="globalSearch" type="search" placeholder="Search mines, IDs, violations..." /><kbd>ESC</kbd></div>
+        <div id="pageContent" class="page-content"></div>
+      </main>
+    </div>
+
+    <div id="modalRoot"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
