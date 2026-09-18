@@ -34,6 +34,10 @@ const inspections = [
   { id: "INS-394", mine: "Singrauli Sector 4", date: "12 Sep 2026", inspector: "Vikram Rao", type: "Routine compliance", status: "Completed" }
 ];
 const regions = ["Telangana", "Odisha", "Jharkhand", "Chhattisgarh", "West Bengal", "Madhya Pradesh"];
+const DEMO_EMAIL = "admin@sih26024.gov.in";
+const DEMO_PASSWORD = "demo2026";
+const DEMO_SESSION_KEY = "coalmine-demo-session";
+const PAGE_ROUTES = ["dashboard", "mines", "violations", "actions", "inspections", "risk-map", "analytics", "reports"];
 let currentPage = "dashboard";
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -68,17 +72,17 @@ function dashboardPage() {
   return `${pageHeading("OVERVIEW / NATIONAL NETWORK", "Coal Mine Compliance Command Center", "A live operational view of safety, compliance and governance across monitored coal mines.", `<button class="btn btn-ghost btn-small" id="refreshBtn">↻ Refresh data</button><button class="btn btn-primary btn-small" data-page-action="reports">Generate report ↗</button>`)}
     <div class="kpi-grid">
       ${[
-        ["Mines monitored", "42", "↗ 3 this quarter", "trend-up", "⌂"],
-        ["Overall compliance", "87%", "↗ 4.2% vs last month", "trend-up", "✓"],
-        ["High-risk mines", "05", "↓ 2 since last review", "trend-up", "△"],
-        ["Open violations", "18", "↗ 3 this week", "trend-down", "⚠"],
-        ["Pending actions", "12", "4 due this week", "trend-down", "◷"]
-      ].map(k => `<div class="kpi-card"><div class="kpi-top"><span>${k[0]}</span><b class="kpi-icon">${k[4]}</b></div><strong class="metric-value">${k[1]}</strong><div class="metric-foot ${k[3]}"><span>${k[2]}</span></div></div>`).join("")}
+        ["Mines monitored", "42", "↗ 3 this quarter", "trend-up", "⌂", "mines"],
+        ["Overall compliance", "87%", "↗ 4.2% vs last month", "trend-up", "✓", "analytics"],
+        ["High-risk mines", "05", "↓ 2 since last review", "trend-up", "△", "mines"],
+        ["Open violations", "18", "↗ 3 this week", "trend-down", "⚠", "violations"],
+        ["Pending actions", "12", "4 due this week", "trend-down", "◷", "actions"]
+      ].map(k => `<div class="kpi-card" data-page-action="${k[5]}"><div class="kpi-top"><span>${k[0]}</span><b class="kpi-icon">${k[4]}</b></div><strong class="metric-value">${k[1]}</strong><div class="metric-foot ${k[3]}"><span>${k[2]}</span></div></div>`).join("")}
     </div>
     <div class="dashboard-grid">
       <section class="panel">${panelHeader("Compliance performance", "Monthly compliance score across the network", `<div class="legend"><span>2026</span><span class="secondary">2025</span></div>`)}<div class="chart-wrap"><canvas id="complianceChart"></canvas></div></section>
       <section class="panel">${panelHeader("Risk distribution", "42 monitored mines")}<div class="donut-layout"><div class="donut"><div class="donut-label"><strong>42</strong><small>MINES</small></div></div><div class="risk-legend"><span><i style="background:var(--red)"></i>Critical <b>2</b></span><span><i style="background:var(--orange)"></i>High <b>3</b></span><span><i style="background:var(--amber)"></i>Medium <b>14</b></span><span><i style="background:var(--green)"></i>Low <b>23</b></span></div></div></section>
-      <section class="panel table-panel full-span">${panelHeader("High-risk mines", "Prioritised by the prototype AI risk engine", `<button class="panel-link" data-page-action="mines">View all mines →</button>`)}<div class="table-scroll"><table class="data-table"><thead><tr><th>Mine</th><th>Region / operator</th><th>Score</th><th>Risk level</th><th>Open violations</th><th>Next inspection</th><th></th></tr></thead><tbody>${highRisk.concat(mines.filter(m=>m.risk==="Medium").slice(0,1)).map(m => `<tr><td><span class="mine-name">${m.name}</span><span class="subtext">${m.id}</span></td><td>${m.location}<span class="subtext">${m.operator}</span></td><td><span class="score ${m.score > 80 ? "good" : "warn"}">${m.score}/100</span></td><td>${riskTag(m.risk)}</td><td>${m.violations}</td><td>${m.inspection}</td><td><button class="link-btn view-mine" data-id="${m.id}">Details →</button></td></tr>`).join("")}</tbody></table></div></section>
+      <section class="panel table-panel full-span">${panelHeader("High-risk mines", "Prioritised by the prototype AI risk engine", `<button class="panel-link" data-page-action="mines">View all mines →</button>`)}<div class="table-scroll"><table class="data-table"><thead><tr><th>Mine</th><th>Region / operator</th><th>Score</th><th>Risk level</th><th>Open violations</th><th>Next inspection</th><th></th></tr></thead><tbody>${highRisk.concat(mines.filter(m=>m.risk==="Medium").slice(0,1)).map(m => `<tr data-mine-id="${m.id}"><td><span class="mine-name">${m.name}</span><span class="subtext">${m.id}</span></td><td>${m.location}<span class="subtext">${m.operator}</span></td><td><span class="score ${m.score > 80 ? "good" : "warn"}">${m.score}/100</span></td><td>${riskTag(m.risk)}</td><td>${m.violations}</td><td>${m.inspection}</td><td><button class="link-btn view-mine" data-id="${m.id}">Details →</button></td></tr>`).join("")}</tbody></table></div></section>
     </div>
     <div class="dashboard-lower"><section class="panel">${panelHeader("Recent violations", "Latest signals requiring attention", `<button class="panel-link" data-page-action="violations">View all →</button>`)}<div class="activity-list">${violations.slice(0,4).map((v,i)=>`<div class="activity"><div class="activity-icon ${v.severity==="Low"?"green":i===2?"blue":""}">${v.severity==="Low"?"✓":"!"}</div><div><strong>${v.desc}</strong><p>${v.mine} · ${statusTag(v.status)}</p></div><time>${v.date.replace(" 2026","")}</time></div>`).join("")}</div></section>
     <section class="panel">${panelHeader("Corrective-action health", "12 actions currently in workflow")}<div class="mini-progress">${statRow("Resolved", 42, "var(--green)")}${statRow("Verification", 25, "var(--blue)")}${statRow("In progress", 23, "var(--amber)")}${statRow("Assigned", 10, "var(--orange)")}</div><div class="disclaimer">DEMO / PROTOTYPE DATA · All mine names, statistics and compliance records shown are fictional demonstration data.</div></section></div>
@@ -96,7 +100,7 @@ function minesPage() {
 }
 function mineRows(list) {
   if (!list.length) return `<tr><td colspan="9" style="text-align:center;padding:35px;color:var(--muted)">No mines match those filters.</td></tr>`;
-  return list.map(m=>`<tr><td>${m.id}</td><td><span class="mine-name">${m.name}</span><span class="subtext">${m.location}</span></td><td>${m.operator}</td><td><span class="score ${m.score>80?"good":"warn"}">${m.score}%</span></td><td>${riskTag(m.risk)}</td><td>${m.violations}</td><td>${m.inspection}</td><td>${statusTag(m.status)}</td><td><button class="link-btn view-mine" data-id="${m.id}">View →</button></td></tr>`).join("");
+  return list.map(m=>`<tr data-mine-id="${m.id}"><td>${m.id}</td><td><span class="mine-name">${m.name}</span><span class="subtext">${m.location}</span></td><td>${m.operator}</td><td><span class="score ${m.score>80?"good":"warn"}">${m.score}%</span></td><td>${riskTag(m.risk)}</td><td>${m.violations}</td><td>${m.inspection}</td><td>${statusTag(m.status)}</td><td><button class="link-btn view-mine" data-id="${m.id}">View →</button></td></tr>`).join("");
 }
 function violationsPage() {
   return `${pageHeading("COMPLIANCE / ISSUE REGISTER", "Violation management", "Review, assign and resolve compliance exceptions across the network.", `<button class="btn btn-primary btn-small" id="newViolation">+ Log violation</button>`)}
@@ -131,9 +135,17 @@ function reportsPage() {
   return `${pageHeading("OUTPUTS / OFFICIAL RECORDS", "Reports", "Generate presentation-ready governance summaries for review.", `<span class="muted" style="font-size:10px">Reporting period: <b style="color:var(--text)">Q3 FY 2026</b></span>`)}<div class="report-grid">${reports.map(r=>`<div class="report-card"><div class="report-icon">${r[2]}</div><div><h3>${r[0]}</h3><p>${r[1]}</p></div><button class="btn btn-ghost btn-small generate-report" data-report="${r[0]}">Generate ↗</button></div>`).join("")}</div><section class="panel" style="margin-top:17px">${panelHeader("Recent generated reports", "Available for download or sharing")}<div class="table-scroll"><table class="data-table"><thead><tr><th>Report</th><th>Generated by</th><th>Date</th><th>Format</th><th>Status</th><th></th></tr></thead><tbody><tr><td>Monthly compliance pulse — August</td><td>Arjun Verma</td><td>01 Sep 2026</td><td>PDF</td><td>${statusTag("Ready")}</td><td><button class="link-btn download-report">Download ↓</button></td></tr><tr><td>Regional risk review — Q2</td><td>Priya Menon</td><td>30 Jun 2026</td><td>PDF</td><td>${statusTag("Ready")}</td><td><button class="link-btn download-report">Download ↓</button></td></tr></tbody></table></div></section>`;
 }
 
-function renderPage(page = currentPage) {
-  currentPage = page;
+function renderPage(page = currentPage, { syncHistory = true, replaceHistory = false } = {}) {
   const pages = { dashboard: dashboardPage, mines: minesPage, violations: violationsPage, actions: actionsPage, inspections: inspectionsPage, "risk-map": riskMapPage, analytics: analyticsPage, reports: reportsPage };
+  if (!pages[page]) page = "dashboard";
+  currentPage = page;
+  if (syncHistory) {
+    const route = `#${page}`;
+    const nextUrl = `${window.location.pathname}${window.location.search}${route}`;
+    if (replaceHistory || window.location.hash !== route) {
+      window.history[replaceHistory ? "replaceState" : "pushState"]({ page }, "", nextUrl);
+    }
+  }
   $("#pageContent").innerHTML = pages[page]();
   $$(".nav-item").forEach(n => n.classList.toggle("active", n.dataset.page === page));
   $("#breadcrumbCurrent").textContent = ({ dashboard:"Overview", mines:"Mine management", violations:"Violations", actions:"Corrective actions", inspections:"Inspections", "risk-map":"Risk map", analytics:"Analytics", reports:"Reports" })[page];
@@ -168,8 +180,9 @@ function notificationDrawer() {
 }
 
 function bindPageEvents() {
-  $$("[data-page-action]").forEach(b=>b.onclick=()=>renderPage(b.dataset.pageAction));
+  $$("[data-page-action]").forEach(b=>b.onclick=e=>{e.preventDefault();renderPage(b.dataset.pageAction);});
   $$(".view-mine").forEach(b=>b.onclick=()=>mineDetail(b.dataset.id));
+  $$("[data-mine-id]").forEach(row=>row.onclick=e=>{if(e.target.closest("button,a,input,select"))return;mineDetail(row.dataset.mineId);});
   const mineSearch=$("#mineSearch"), riskFilter=$("#riskFilter"), stateFilter=$("#stateFilter");
   const filterMines=()=>{ if(!mineSearch)return;const q=mineSearch.value.toLowerCase();const list=mines.filter(m=>(!q||`${m.id} ${m.name} ${m.operator}`.toLowerCase().includes(q))&&(!riskFilter.value||m.risk===riskFilter.value)&&(!stateFilter.value||m.state===stateFilter.value));$("#minesTable tbody").innerHTML=mineRows(list);bindPageEvents(); };
   if(mineSearch){mineSearch.oninput=filterMines;riskFilter.onchange=filterMines;stateFilter.onchange=filterMines;}
@@ -190,18 +203,63 @@ function bindPageEvents() {
 }
 
 function init() {
-  $("#loginForm").onsubmit=e=>{e.preventDefault();enterApp();};
+  $("#loginForm").onsubmit=e=>{
+    e.preventDefault();
+    const email = $("#loginEmail").value.trim();
+    const password = $("#loginPassword").value;
+    if (email === DEMO_EMAIL && password === DEMO_PASSWORD) enterApp();
+    else toast("Invalid demo credentials", "!");
+  };
   $("#demoAccess").onclick=enterApp;
   $(".password-toggle").onclick=()=>{const i=$("#loginPassword");i.type=i.type==="password"?"text":"password";};
-  function enterApp(){ $("#loginScreen").classList.add("hidden");$("#appShell").classList.remove("hidden");renderPage("dashboard"); }
-  $$(".nav-item").forEach(n=>n.onclick=()=>{renderPage(n.dataset.page);$("#sidebar").classList.remove("open");$("#sidebarOverlay").classList.remove("open");});
+  function enterApp(){
+    try { sessionStorage.setItem(DEMO_SESSION_KEY, "active"); } catch {}
+    $("#loginScreen").classList.add("hidden");
+    $("#appShell").classList.remove("hidden");
+    renderPage(PAGE_ROUTES.includes(location.hash.slice(1)) ? location.hash.slice(1) : "dashboard", { replaceHistory: true });
+  }
+  $$(".nav-item").forEach(n=>n.onclick=e=>{e.preventDefault();renderPage(n.dataset.page);$("#sidebar").classList.remove("open");$("#sidebarOverlay").classList.remove("open");});
+  $$(".brand-lockup").forEach(brand=>{
+    brand.setAttribute("role","button");
+    brand.setAttribute("tabindex","0");
+    const goHome=()=>renderPage("dashboard");
+    brand.onclick=goHome;
+    brand.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();goHome();}};
+  });
   $("#menuToggle").onclick=()=>{$("#sidebar").classList.add("open");$("#sidebarOverlay").classList.add("open");};
   $("#closeSidebar").onclick=$("#sidebarOverlay").onclick=()=>{$("#sidebar").classList.remove("open");$("#sidebarOverlay").classList.remove("open");};
-  $("#logoutBtn").onclick=()=>{ $("#appShell").classList.add("hidden");$("#loginScreen").classList.remove("hidden");toast("You have been signed out"); };
+  $("#logoutBtn").onclick=()=>{
+    try { sessionStorage.removeItem(DEMO_SESSION_KEY); } catch {}
+    $("#appShell").classList.add("hidden");
+    $("#loginScreen").classList.remove("hidden");
+    window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}`);
+    toast("You have been signed out");
+  };
   $("#notificationBtn").onclick=notificationDrawer;
   $("#globalSearchToggle").onclick=()=>{$("#globalSearchBar").classList.toggle("hidden");if(!$("#globalSearchBar").classList.contains("hidden"))$("#globalSearch").focus();};
   $("#globalSearch").oninput=e=>{const q=e.target.value.toLowerCase();if(q.length>1){const m=mines.find(x=>`${x.id} ${x.name}`.toLowerCase().includes(q)),v=violations.find(x=>`${x.id} ${x.mine}`.toLowerCase().includes(q));if(m){renderPage("mines");setTimeout(()=>{$("#mineSearch").value=q;$("#mineSearch").dispatchEvent(new Event("input"));},0);}else if(v){renderPage("violations");toast(`Found ${v.id} · ${v.mine}`,"⌕");}}};
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeModal();$("#globalSearchBar").classList.add("hidden");}});
   window.addEventListener("resize",()=>{if(currentPage==="dashboard")drawComplianceChart();if(currentPage==="analytics")drawResolutionChart();});
+  const restoreFromHistory=()=>{
+    let sessionActive = false;
+    try { sessionActive = sessionStorage.getItem(DEMO_SESSION_KEY) === "active"; } catch {}
+    if (!sessionActive) {
+      $("#appShell").classList.add("hidden");
+      $("#loginScreen").classList.remove("hidden");
+      return;
+    }
+    $("#loginScreen").classList.add("hidden");
+    $("#appShell").classList.remove("hidden");
+    renderPage(PAGE_ROUTES.includes(location.hash.slice(1)) ? location.hash.slice(1) : "dashboard", { syncHistory: false });
+  };
+  window.addEventListener("popstate",restoreFromHistory);
+  window.addEventListener("hashchange",restoreFromHistory);
+  try {
+    if (sessionStorage.getItem(DEMO_SESSION_KEY) === "active") {
+      $("#loginScreen").classList.add("hidden");
+      $("#appShell").classList.remove("hidden");
+      renderPage(PAGE_ROUTES.includes(location.hash.slice(1)) ? location.hash.slice(1) : "dashboard", { syncHistory: false });
+    }
+  } catch {}
 }
 init();

@@ -1,0 +1,2 @@
+- [Static JavaScript publishing](static-javascript-publishing.md) — Vite production builds require static app scripts to be declared as module entries.
+- [Prototype SPA navigation](prototype-spa-navigation.md) — Hash routes plus a sessionStorage demo flag preserve navigation and refresh behavior without adding real authentication.
